@@ -1,0 +1,15 @@
+<?php
+
+return [
+    "db"=>[
+        "host"=>"db",
+        "name"=>"project_management",
+        "user"=>"root",
+        "password"=>"inchoo"
+    ]
+];
+
+
+
+
+
