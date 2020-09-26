@@ -1,7 +1,7 @@
 <?php
 namespace App\Core;
 
-class Db extends \PDO
+class Database extends \PDO
 {
     private static $instance;
 
