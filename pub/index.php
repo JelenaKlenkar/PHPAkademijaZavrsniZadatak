@@ -11,7 +11,7 @@ spl_autoload_register(function ($class) {
         require_once $filename;
     }
 });
-
+session_start();
 $router = new \App\Core\Router();
 $application = new \App\Core\Application($router);
 
