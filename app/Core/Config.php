@@ -6,7 +6,7 @@ class Config{
 
     public static function get(string $key)
     {
-        $config = include BP . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config.php';
+        $config = include BP . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'config.php.sample';
         return $config[$key] ?? null;
     }
 }

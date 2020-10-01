@@ -1,8 +1,6 @@
 <?php
-
 define('BP', dirname(__DIR__));
 
-// autoloader
 spl_autoload_register(function ($class) {
     $class = lcfirst($class);
     $filename = BP . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
@@ -11,16 +9,22 @@ spl_autoload_register(function ($class) {
         require_once $filename;
     }
 });
+
 session_start();
+
 $router = new \App\Core\Router();
 $application = new \App\Core\Application($router);
 
 try {
     $response = $application->run();
-} catch (\App\Exception\RouterException $e) {
-    $response = '<h1>404</h1>';
+} catch (\App\Core\Exception\RouterException $e) {
+    http_response_code(404);
+    $response = '<h1>404 Not Found</h1>';
 } catch (\Exception $e) {
-    $response = '<h1>500</h1>';
+    http_response_code(500);
+    $response = '<h1>500 Internal Server Error</h1>';
 }
 
-echo $response;
+if ($response) {
+    echo $response;
+}

@@ -1,35 +1,37 @@
 <?php
+declare(strict_types=1);
+
 namespace App\Core;
 
 class View
 {
-    private $layout;
+    public const VIEW_PATH = BP . DIRECTORY_SEPARATOR . 'view';
 
-
-    public function __construct($layout = "layout")
+    public function render(string $template, array $args = []): string
     {
-        $this->layout = basename($layout);
-    }
-
-    public function render($name, $args = [])
-    {
+        $templateFileName = $this->getTemplateFileName($template);
 
         ob_start();
-        extract($args);
-        include BP . DIRECTORY_SEPARATOR . "app/view/$name.phtml";
-        $content = ob_get_clean();
-
-        if ($this->layout) {
-            include BP . DIRECTORY_SEPARATOR . "app/view/{$this->layout}.phtml";
-        } else {
-            echo $content;
+        try {
+            extract($this->modifyArgs($args), EXTR_SKIP);
+            include $templateFileName;
+        } catch (\Exception $e) {
+            ob_end_clean();
+            throw $e;
         }
-        return $this;
+
+        return ob_get_clean() ?: '';
     }
 
-    public function formatDate(string $date, string $format = 'd.m. H:i'): string
+    protected function getTemplateFileName(string $template): string
     {
-        $date = new \DateTime($date);
-        return $date->format($format);
+        return self::VIEW_PATH . DIRECTORY_SEPARATOR . $template . '.phtml';
+    }
+
+    protected function modifyArgs(array $args): array
+    {
+
+        $args['currentUser'] = Auth::getInstance()->getCurrentUser();
+        return $args;
     }
 }
