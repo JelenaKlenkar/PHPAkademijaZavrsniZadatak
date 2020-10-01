@@ -59,4 +59,9 @@ class Session extends DataObject
         unset($_SESSION['user']);
         session_destroy();
     }
+
+    public function getUser()
+    {
+        return $_SESSION['user'];
+    }
 }

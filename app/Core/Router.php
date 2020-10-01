@@ -1,20 +1,19 @@
 <?php
+declare(strict_types=1);
+
 namespace App\Core;
 
-use App\Exception\RouterException;
+use App\Core\Exception\RouterException;
 
 class Router implements RouterInterface
 {
-    public const URL_SUFFIX = '.html';
-
     public function match(string $pathInfo)
     {
         $pathInfo = trim($pathInfo, '/');
-        $pathInfo = str_replace(self::URL_SUFFIX, '', $pathInfo);
         $parts = $pathInfo ? explode('/', $pathInfo) : [];
 
         if (count($parts) > 2) {
-            throw new RouterException("Not valid URL: {$pathInfo}");
+            throw new RouterException('Not valid URL');
         }
 
         $controller = ucfirst(strtolower($parts[0] ?? 'home')) . 'Controller';
@@ -23,7 +22,7 @@ class Router implements RouterInterface
         $className = "\\App\\Controller\\{$controller}";
 
         if (!method_exists($className, $method)) {
-            throw new RouterException("Method doesn't exist : {$className}::$method");
+            throw new RouterException('Method does not exist');
         }
 
         $object = new $className();
