@@ -1,8 +1,8 @@
-drop DATABASE if exists project_management;
-CREATE DATABASE project_management CHARACTER SET utf8mb4 COLLATE
+drop DATABASE if exists polaznik9;
+CREATE DATABASE polaznik9 CHARACTER SET utf8mb4 COLLATE
 utf8mb4_unicode_ci;
 
-use project_management;
+use polaznik9;
 
 create table job_position(
     id int not null primary key auto_increment,
