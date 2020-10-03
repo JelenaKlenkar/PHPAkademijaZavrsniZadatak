@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use Config;
+
 
 class Database extends \PDO
 {
@@ -11,14 +11,14 @@ class Database extends \PDO
 
     public function __construct()
     {
-        $dbConfig = Config::get('db');
+        $dbConfig = Config::get('Database');
 
         $dsn = 'mysql:host=' . $dbConfig['host'] . ';dbname=' . $dbConfig['name'] . ';charset=utf8';
         parent::__construct($dsn, $dbConfig['user'], $dbConfig['password']);
 
         $this->setAttribute(
             \PDO::ATTR_DEFAULT_FETCH_MODE,
-            \PDO::FETCH_ASSOC
+            \PDO::FETCH_OBJ
         );
     }
 

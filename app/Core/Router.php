@@ -7,6 +7,7 @@ use App\Core\Exception\RouterException;
 
 class Router implements RouterInterface
 {
+
     public function match(string $pathInfo)
     {
         $pathInfo = trim($pathInfo, '/');

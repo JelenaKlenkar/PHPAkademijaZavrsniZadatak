@@ -1,129 +1,114 @@
 <?php
+
 namespace App\Controller;
 
-use App\Core\Request;
-use App\Core\Session;
-use App\Core\View;
-use App\Model\User\User;
-use App\Model\User\UserRepository;
-use App\Model\User\UserResource;
+use App\Model;
+use App\Model\User;
 
-class UserController{
 
-    private $userRepository;
-    private $userResource;
-    private $session;
-
-    public function __construct()
-    {
-        $this->userRepository = new UserRepository();
-        $this->userResource = new UserResource();
-        $this->session = Session::getInstance();
-    }
-
+class UserController extends AbstractController
+{
     public function loginAction()
     {
-        $view = new View();
-        $view->render('login');
-    }
-
-    public function loginSubmitAction()
-    {
-        // Check if user is logged in already
-        $session = $this->session;
-        if ($session->getUser()) {
-            return;
+        if (!$this->auth->isLoggedIn()) {
+            return $this->view->render('login');
         }
 
-        // Get data from POST
-        $postData = Request::getPostParams();
-        $email = Request::getPostParam('email');
-        $password = Request::getPostParam('pass');
-
-        // Check if submit data is missing
-        if (!$email || !$password) {
-            return;
-        }
-
-        // Get user by email
-        $user =  $this->userRepository->getUserByEmail($email);
-
-        // No user with this email
-        if (!$user) {
-            return;
-        }
-
-        // User Exists, get hash to check password
-        $hash = $user->getPass();
-
-        // Invalid username or password
-        if (!password_verify($password, $hash)) {
-            return;
-        }
-
-        // All ok, login user, attach to session and redirect somewhere
-        $session->setUser($user);
-        header('Location: ' . Config::get('url'));
-
-//        $path = session_save_path();
-//        $sessionID = session_id();
-//        $session->setTest('test');
-////        $_SESSION['favcolor'] = 'green';
-////        $_SESSION['animal']   = 'cat';
-////        $_SESSION['time']     = time();
-    }
-
-    /**
-     * Logout and redirect to homepage
-     */
-    public function logoutAction()
-    {
-        Session::getInstance()->logout();
-        header('Location: ' . Config::get('url'));
+        header('Location: /user/');
     }
 
     public function registerAction()
     {
-        // Check session, if it exists, redirect to home
-        if ($this->session->isLoggedIn()) {
-            $url = Config::get('url');
-            header('Location: ' . $url);
-            exit();
+        if (!$this->auth->isLoggedIn()) {
+            return $this->view->render('register');
         }
 
-        $view = new View();
-        $view->render('register', []);
+        header('Location: /user/');
     }
 
     public function registerSubmitAction()
     {
-        $postData = Request::getPostParams();
-        $email = Request::getPostParam('email');
-        $firstname = Request::getPostParam('firstname');
-        $lastname = Request::getPostParam('lastname');
-        $password = Request::getPostParam('pass');
-
-        // Check if submit data is missing
-        if (!$email || !$firstname || !$lastname || !$password) {
+        if (!$this->isPost()) {
+            // only POST requests are allowed
+            header('Location: /user/');
             return;
         }
 
-        // Check if user email already exists
-        if($this->userRepository->userEmailExists($email)) {
+        $requiredKeys = ['username', 'email', 'password', 'confirm_password'];
+        if (!$this->validateData($_POST, $requiredKeys)) {
+            // set error message
+            header('Location: /user/register');
             return;
         }
 
-        // Create new user
-        $result = $this->userResource->insertUser($postData);
-
-        // Something went wrong inserting user
-        if (!$result) {
+        if ($_POST['password'] !== $_POST['confirm_password']) {
+            // set error message
+            header('Location: /user/register');
             return;
         }
 
-        // Everything ok
-        Session::getInstance()->logout();
-        $url = Config::get('url') . 'user/login';
-        header('Location: ' . $url);
+        $user = User::getOne('email', $_POST['email']);
+
+        if ($user->getId()) {
+            // user already exists
+            header('Location: /user/register');
+            return;
+        }
+
+        (new \App\Model\User\UserResource)->insertUser([
+            'username' => $_POST['username'] ?? null,
+            'email' => $_POST['email'] ?? null,
+            'user_type' => $_POST['user_type'],
+            'password' => password_hash($_POST['password'], PASSWORD_DEFAULT)
+        ]);
+
+        header('Location: /user/login');
+    }
+
+    public function loginSubmitAction()
+    {
+        // only POST requests are allowed
+        if (!$this->isPost() || $this->auth->isLoggedIn()) {
+            header('Location: /user/login');
+            return;
+        }
+
+        $requiredKeys = ['email', 'password'];
+        if (!$this->validateData($_POST, $requiredKeys)) {
+            // set error message
+            header('Location: /user/login');
+            return;
+        }
+
+        $user = User::getOne('email', $_POST['email']);
+
+        if (!$user->getId() || !password_verify($_POST['password'], $user->getPassword())) {
+            // set error message
+            header('Location: /user/login');
+            return;
+        }
+
+        $this->auth->login($user);
+        header('Location: /user/loginSubmit');
+    }
+
+    protected function validateData(array $data, array $keys): bool
+    {
+        foreach ($keys as $key) {
+            $isValueValid = isset($data[$key]) && $data[$key];
+            if (!$isValueValid) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function logoutAction()
+    {
+        if ($this->auth->isLoggedIn()) {
+            $this->auth->logout();
+        }
+
+        header('Location: /');
     }
 }
