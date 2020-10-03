@@ -11,7 +11,7 @@ class Database extends \PDO
 
     public function __construct()
     {
-        $dbConfig = Config::get('Database');
+        $dbConfig = Config::get('db');
 
         $dsn = 'mysql:host=' . $dbConfig['host'] . ';dbname=' . $dbConfig['name'] . ';charset=utf8';
         parent::__construct($dsn, $dbConfig['user'], $dbConfig['password']);
