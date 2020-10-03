@@ -4,7 +4,7 @@
 namespace App\Controller;
 
 
-use App\Model\Employee\EmployeeResource;
+use App\Model\User;
 
 class HomeController extends AbstractController {
 
