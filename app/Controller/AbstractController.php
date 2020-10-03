@@ -11,13 +11,13 @@ abstract class AbstractController
 {
     protected $view;
     protected $auth;
-    protected $session;
+
 
     public function __construct()
     {
         $this->view = new View();
         $this->auth = Auth::getInstance();
-        $this->session = Session::getInstance();
+
     }
 
     protected function isPost(): bool
