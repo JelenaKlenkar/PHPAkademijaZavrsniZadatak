@@ -2,10 +2,10 @@
 
 return [
     "db"=>[
-        "host"=>"localhost",
-        "name"=>"polaznik9",
-        "user"=>"root",
-        "password"=>"inchoo"
+        "host"=>"",
+        "name"=>"",
+        "user"=>"",
+        "password"=>""
     ]
 ];
 
