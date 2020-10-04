@@ -1,15 +1,21 @@
 <?php
 include 'layout/header.phtml';
-use App\Controller\UserController;
+
 ?>
-<form method="post" action="/user/login">
+<style>
+    form {text-align: center}
+    form {margin: 0 auto}
+    form{width: 250px}
+</style>
+
+<form method="post" action="/~polaznik9/user/login">
     <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" class="form-control" id="email" name="email">
-    </div>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email">
+
     <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" name="password">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password">
     </div>
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
