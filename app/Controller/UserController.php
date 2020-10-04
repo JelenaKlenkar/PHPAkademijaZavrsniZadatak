@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Model;
 use App\Model\User;
-
 
 class UserController extends AbstractController
 {
@@ -14,7 +12,7 @@ class UserController extends AbstractController
             return $this->view->render('login');
         }
 
-        header('Location: /user/');
+        header('Location: /');
     }
 
     public function registerAction()
@@ -23,18 +21,18 @@ class UserController extends AbstractController
             return $this->view->render('register');
         }
 
-        header('Location: /user/');
+        header('Location: /');
     }
 
     public function registerSubmitAction()
     {
         if (!$this->isPost()) {
             // only POST requests are allowed
-            header('Location: /user/');
+            header('Location: /');
             return;
         }
 
-        $requiredKeys = ['username', 'email', 'password', 'confirm_password'];
+        $requiredKeys = ['first_name', 'last_name', 'email', 'password', 'confirm_password'];
         if (!$this->validateData($_POST, $requiredKeys)) {
             // set error message
             header('Location: /user/register');
@@ -55,11 +53,11 @@ class UserController extends AbstractController
             return;
         }
 
-        (new \App\Model\User\UserResource)->insertUser([
-            'username' => $_POST['username'] ?? null,
-            'email' => $_POST['email'] ?? null,
-            'user_type' => $_POST['user_type'],
-            'password' => password_hash($_POST['password'], PASSWORD_DEFAULT)
+        User::insert([
+            'first_name' => $_POST['first_name'] ?? null,
+            'last_name' => $_POST['last_name'] ?? null,
+            'email' => $_POST['email'],
+            'pass' => password_hash($_POST['password'], PASSWORD_DEFAULT)
         ]);
 
         header('Location: /user/login');
@@ -69,7 +67,7 @@ class UserController extends AbstractController
     {
         // only POST requests are allowed
         if (!$this->isPost() || $this->auth->isLoggedIn()) {
-            header('Location: /user/login');
+            header('Location: /');
             return;
         }
 
@@ -89,7 +87,7 @@ class UserController extends AbstractController
         }
 
         $this->auth->login($user);
-        header('Location: /user/loginSubmit');
+        header('Location: /');
     }
 
     protected function validateData(array $data, array $keys): bool
